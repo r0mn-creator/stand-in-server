@@ -20,6 +20,7 @@ extern "C" {
 }
 
 // local includes
+#include "auto_bitrate.h"
 #include "config.h"
 #include "crypto.h"
 #include "display_device.h"
@@ -374,9 +375,13 @@ namespace stream {
 
       safe::mail_raw_t::event_t<bool> idr_events;
       safe::mail_raw_t::event_t<std::pair<int64_t, int64_t>> invalidate_ref_frames_events;
+      safe::mail_raw_t::event_t<int> bitrate_events;
 
       std::unique_ptr<platf::deinit_t> qos;
     } video;
+
+    // Only touched from the control thread
+    std::unique_ptr<auto_bitrate::controller_t> auto_bitrate;
 
     struct {
       crypto::cipher::cbc_t cipher;
@@ -960,6 +965,9 @@ namespace stream {
       BOOST_LOG(debug) << "type [IDX_REQUEST_IDR_FRAME]"sv;
 
       session->video.idr_events->raise(true);
+      if (session->auto_bitrate) {
+        session->auto_bitrate->on_loss(1);
+      }
     });
 
     server->map(packetTypes[IDX_INVALIDATE_REF_FRAMES], [&](session_t *session, const std::string_view &payload) {
@@ -973,6 +981,9 @@ namespace stream {
         << "lastFrame [" << lastFrame << ']';
 
       session->video.invalidate_ref_frames_events->raise(std::make_pair(firstFrame, lastFrame));
+      if (session->auto_bitrate) {
+        session->auto_bitrate->on_loss(lastFrame - firstFrame + 1);
+      }
     });
 
     server->map(packetTypes[IDX_INPUT_DATA], [&](session_t *session, const std::string_view &payload) {
@@ -1151,6 +1162,10 @@ namespace stream {
           if (session->state.load(std::memory_order_acquire) == session::state_e::STOPPING) {
             pos = server->_sessions->erase(pos);
 
+            if (session->auto_bitrate) {
+              session->auto_bitrate->finish();
+            }
+
             if (session->control.peer) {
               {
                 auto ptslg = server->_peer_to_session.lock();
@@ -1182,6 +1197,12 @@ namespace stream {
               auto hdr_info = hdr_queue->pop();
 
               send_hdr_mode(session, std::move(hdr_info));
+            }
+
+            if (session->auto_bitrate) {
+              if (auto bitrate = session->auto_bitrate->tick(now)) {
+                session->video.bitrate_events->raise(*bitrate);
+              }
             }
           }
 
@@ -2172,6 +2193,10 @@ namespace stream {
 
       session->video.idr_events = mail->event<bool>(mail::idr);
       session->video.invalidate_ref_frames_events = mail->event<std::pair<int64_t, int64_t>>(mail::invalidate_ref_frames);
+      session->video.bitrate_events = mail->event<int>(mail::bitrate);
+      if (!config.auto_bitrate_key.empty()) {
+        session->auto_bitrate = std::make_unique<auto_bitrate::controller_t>(config.auto_bitrate_key, config.auto_bitrate_ceiling, config.monitor.bitrate, config.monitor.framerate);
+      }
       session->video.lowseq = 0;
       session->video.ping_payload = launch_session.av_ping_payload;
       if (config.encryptionFlagsEnabled & SS_ENC_VIDEO) {

@@ -23,6 +23,7 @@ namespace config {
     bool headless_mode;
     bool limit_framerate;
     bool double_refreshrate;
+    bool auto_bitrate;  // Lower the bitrate when the client loses frames, raise it while it doesn't
     // ffmpeg params
     int qp;  // higher == more compression and less quality
 

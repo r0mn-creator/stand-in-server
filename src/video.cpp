@@ -420,6 +420,10 @@ namespace video {
       }
     }
 
+    bool set_bitrate(int bitrate_kbps) override {
+      return device && device->nvenc && device->nvenc->set_bitrate(bitrate_kbps);
+    }
+
     nvenc::nvenc_encoded_frame encode_frame(uint64_t frame_index) {
       if (!device || !device->nvenc) {
         return {};
@@ -1953,6 +1957,7 @@ namespace video {
     auto packets = mail::man->queue<packet_t>(mail::video_packets);
     auto idr_events = mail->event<bool>(mail::idr);
     auto invalidate_ref_frames_events = mail->event<std::pair<int64_t, int64_t>>(mail::invalidate_ref_frames);
+    auto bitrate_events = mail->event<int>(mail::bitrate);
 
     {
       // Load a dummy image into the AVFrame to ensure we have something to encode
@@ -1996,6 +2001,19 @@ namespace video {
       // the blank dummy frame just to let Moonlight know that we're alive.
       if (shutdown_event->peek() || !images->running() || (reinit_event.peek() && frame_nr > 1)) {
         break;
+      }
+
+      if (bitrate_events->peek()) {
+        // Change the bitrate in place if the encoder can; otherwise leave the event
+        // pending and return, so capture_async() recreates the encoder with it
+        auto bitrate = *bitrate_events->pop();
+        if (!session->set_bitrate(bitrate)) {
+          if (!bitrate_events->peek()) {
+            bitrate_events->raise(bitrate);
+          }
+          BOOST_LOG(info) << "Recreating the encoder for a bitrate of "sv << bitrate << " Kbps"sv;
+          break;
+        }
       }
 
       bool requested_idr_frame = false;
@@ -2391,6 +2409,7 @@ namespace video {
 
     auto touch_port_event = mail->event<input::touch_port_t>(mail::touch_port);
     auto hdr_event = mail->event<hdr_info_t>(mail::hdr);
+    auto bitrate_event = mail->event<int>(mail::bitrate);
 
     // Encoding takes place on this thread
     platf::adjust_thread_priority(platf::thread_priority_e::high);
@@ -2413,6 +2432,11 @@ namespace video {
       }
 
       auto &encoder = *chosen_encoder;
+
+      // A bitrate change the previous encoder couldn't apply in place
+      if (bitrate_event->peek()) {
+        config.bitrate = *bitrate_event->pop();
+      }
 
       auto encode_device = make_encode_device(*display, encoder, config);
       if (!encode_device) {

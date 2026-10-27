@@ -386,6 +386,12 @@ namespace nvenc {
       return false;
     }
 
+    reconfig_state.init_params = init_params;
+    reconfig_state.enc_config = enc_config;
+    reconfig_state.init_params.encodeConfig = &reconfig_state.enc_config;
+    reconfig_state.framerate = client_config.framerate;
+    reconfig_state.vbv_percentage_increase = config.vbv_percentage_increase;
+
     if (async_event_handle) {
       NV_ENC_EVENT_PARAMS event_params = {min_struct_version(NV_ENC_EVENT_PARAMS_VER)};
       event_params.completionEvent = async_event_handle;
@@ -661,6 +667,33 @@ namespace nvenc {
     }
 
     return false;
+  }
+
+  bool nvenc_base::set_bitrate(int bitrate_kbps) {
+    if (!encoder || !reconfig_state.framerate) {
+      return false;
+    }
+
+    auto &rc_params = reconfig_state.enc_config.rcParams;
+    rc_params.averageBitRate = bitrate_kbps * 1000;
+    if (rc_params.vbvBufferSize) {
+      rc_params.vbvBufferSize = bitrate_kbps * 1000 / reconfig_state.framerate;
+      rc_params.vbvBufferSize += rc_params.vbvBufferSize * reconfig_state.vbv_percentage_increase / 100;
+    }
+
+    NV_ENC_RECONFIGURE_PARAMS reconfigure_params = {min_struct_version(NV_ENC_RECONFIGURE_PARAMS_VER)};
+    reconfigure_params.reInitEncodeParams = reconfig_state.init_params;
+    reconfigure_params.reInitEncodeParams.encodeConfig = &reconfig_state.enc_config;
+    reconfigure_params.resetEncoder = 0;
+    reconfigure_params.forceIDR = 0;
+
+    if (nvenc_failed(nvenc->nvEncReconfigureEncoder(encoder, &reconfigure_params))) {
+      BOOST_LOG(error) << "NvEnc: NvEncReconfigureEncoder() failed: " << last_nvenc_error_string;
+      return false;
+    }
+
+    BOOST_LOG(info) << "NvEnc: bitrate changed to " << bitrate_kbps << " Kbps";
+    return true;
   }
 
   uint32_t nvenc_base::min_struct_version(uint32_t version, uint32_t v11_struct_version, uint32_t v12_struct_version) {

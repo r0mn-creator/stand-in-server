@@ -440,6 +440,7 @@ namespace config {
     false, // headless_mode
     true, // limit_framerate
     false, // double_refreshrate
+    true, // auto_bitrate
 
     28,  // qp
 
@@ -1106,6 +1107,7 @@ namespace config {
 
     bool_f(vars, "headless_mode", video.headless_mode);
     bool_f(vars, "limit_framerate", video.limit_framerate);
+    bool_f(vars, "auto_bitrate", video.auto_bitrate);
     bool_f(vars, "double_refreshrate", video.double_refreshrate);
     int_f(vars, "qp", video.qp);
     int_between_f(vars, "hevc_mode", video.hevc_mode, {0, 3});

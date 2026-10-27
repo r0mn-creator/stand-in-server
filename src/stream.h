@@ -36,6 +36,10 @@ namespace stream {
     uint32_t encryptionFlagsEnabled;
 
     std::optional<int> gcmap;
+
+    // Set when the server adjusts the bitrate automatically
+    std::string auto_bitrate_key;
+    int auto_bitrate_ceiling = 0;
   };
 
   namespace session {

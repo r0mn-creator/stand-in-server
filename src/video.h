@@ -213,6 +213,14 @@ namespace video {
     virtual void request_normal_frame() = 0;
 
     virtual void invalidate_ref_frames(int64_t first_frame, int64_t last_frame) = 0;
+
+    /**
+     * @brief Change the bitrate without restarting the encoder.
+     * @return `false` when the encoder can't, so it has to be recreated instead.
+     */
+    virtual bool set_bitrate(int bitrate_kbps) {
+      return false;
+    }
   };
 
   // encoders

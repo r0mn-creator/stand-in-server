@@ -22,6 +22,7 @@ extern "C" {
 #include <boost/bind.hpp>
 
 // local includes
+#include "auto_bitrate.h"
 #include "config.h"
 #include "globals.h"
 #include "input.h"
@@ -1130,6 +1131,17 @@ namespace rtsp_stream {
 
       BOOST_LOG(debug) << "Final adjusted video encoding bitrate is "sv << configuredBitrateKbps << " Kbps"sv;
       config.monitor.bitrate = configuredBitrateKbps;
+    }
+
+    // The client's bitrate becomes the ceiling; start at what held up last time
+    if (config::video.auto_bitrate && !session.input_only) {
+      boost::system::error_code ec;
+      auto client_endpoint = sock.remote_endpoint(ec);
+      if (!ec) {
+        config.auto_bitrate_key = auto_bitrate::make_key(session.unique_id, client_endpoint.address());
+        config.auto_bitrate_ceiling = config.monitor.bitrate;
+        config.monitor.bitrate = auto_bitrate::starting_kbps(config.auto_bitrate_key, config.auto_bitrate_ceiling);
+      }
     }
 
     if (config.monitor.videoFormat == 1 && video::active_hevc_mode == 1) {
