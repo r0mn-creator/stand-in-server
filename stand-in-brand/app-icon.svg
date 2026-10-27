@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <title>Stand-In</title>
+  <rect width="1024" height="1024" rx="224" fill="#12161C"/>
+  <rect x="2" y="2" width="1020" height="1020" rx="222" fill="none" stroke="#2C3542" stroke-width="4"/>
+  <g transform="translate(0 26)">
+  <!-- the virtual monitor on the big PC, behind: dashed and with no stand, because it isn't physical -->
+  <rect x="496" y="246" width="384" height="276" rx="44" fill="none" stroke="#98A2B3" stroke-width="28" stroke-linecap="round" stroke-dasharray="58 42"/>
+  <!-- the real monitor in front -->
+  <rect x="148" y="330" width="444" height="304" rx="48" fill="#1A2029" stroke="#E6EAF0" stroke-width="44"/>
+  <rect x="334" y="652" width="72" height="62" fill="#E6EAF0"/>
+  <rect x="256" y="700" width="228" height="44" rx="22" fill="#E6EAF0"/>
+  <!-- the link between them -->
+  <g fill="none" stroke="#2DD4BF" stroke-width="44" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M412 420H748"/><path d="M690 362L748 420L690 478"/>
+    <path d="M760 530H424"/><path d="M482 472L424 530L482 588"/>
+  </g>
+  </g>
+</svg>

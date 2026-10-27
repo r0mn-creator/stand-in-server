@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32">
+  <title>Stand-In</title>
+  <defs><mask id="behind"><rect width="32" height="32" fill="#fff"/><rect x="0" y="7.5" width="23" height="17.5" rx="4" fill="#000"/></mask></defs>
+  <g fill="none" stroke="#FFFFFF" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="13" y="3.5" width="16.5" height="11.5" rx="2.5" stroke-opacity="0.55" mask="url(#behind)"/>
+    <rect x="2.5" y="10" width="18" height="12.5" rx="2.5"/>
+    <path d="M11.5 22.5V26.5M7.5 27.5H15.5"/>
+  </g>
+  
+</svg>
