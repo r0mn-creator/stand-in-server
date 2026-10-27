@@ -4,6 +4,10 @@
 echo "Loading uhid kernel module for DS5 emulation."
 modprobe uhid
 
+# Load vhci-hcd (USB devices forwarded from Stand-In clients)
+echo "Loading vhci-hcd kernel module for USB forwarding."
+modprobe vhci-hcd || echo "warning: vhci-hcd not available, USB forwarding will not work."
+
 # Check if we're in an rpm-ostree environment
 if [ ! -x "$(command -v rpm-ostree)" ]; then
   echo "Not in an rpm-ostree environment, proceeding with post install steps."
@@ -12,10 +16,10 @@ if [ ! -x "$(command -v rpm-ostree)" ]; then
   path_to_setcap=$(which setcap)
   path_to_sunshine=$(readlink -f "$(which sunshine)")
   if [ -x "$path_to_setcap" ] ; then
-    echo "Setting CAP_SYS_ADMIN capability on Sunshine binary."
-    echo "$path_to_setcap cap_sys_admin+p $path_to_sunshine"
-    $path_to_setcap cap_sys_admin+p $path_to_sunshine
-    echo "CAP_SYS_ADMIN capability set on Sunshine binary."
+    echo "Setting CAP_SYS_ADMIN (screen capture) and CAP_DAC_OVERRIDE (USB forwarding) capabilities on Sunshine binary."
+    echo "$path_to_setcap cap_sys_admin,cap_dac_override+p $path_to_sunshine"
+    $path_to_setcap cap_sys_admin,cap_dac_override+p $path_to_sunshine
+    echo "Capabilities set on Sunshine binary."
   else
     echo "error: setcap not found or not executable."
   fi

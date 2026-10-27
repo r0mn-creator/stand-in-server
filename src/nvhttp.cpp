@@ -24,6 +24,7 @@
 #include "config.h"
 #include "display_device.h"
 #include "file_handler.h"
+#include "usb_forward.h"
 #include "globals.h"
 #include "httpcommon.h"
 #include "logging.h"
@@ -1712,6 +1713,23 @@ namespace nvhttp {
       tree.put("root.<xmlattr>.status_code"s, 401);
       tree.put("root.<xmlattr>.query"s, req->path);
       tree.put("root.<xmlattr>.status_message"s, "The client is not authorized. Certificate verification failed."s);
+    };
+
+    // Stand-In clients forward USB devices by upgrading a verified connection
+    https_server.on_upgrade = [](std::unique_ptr<SunshineHTTPS> &socket, req_https_t req) {
+      auto named_cert_p = get_verified_cert(req);
+      auto upgrade = req->header.find("Upgrade");
+      auto busid = req->header.find("X-Usb-Busid");
+      if (!named_cert_p || req->path != "/usb" || upgrade == req->header.end() || upgrade->second != usb_forward::upgrade_protocol || busid == req->header.end()) {
+        return;
+      }
+
+      if (!(named_cert_p->perm & PERM::input_controller)) {
+        BOOST_LOG(info) << "USB forward: "sv << named_cert_p->name << " isn't allowed controller input"sv;
+        return;
+      }
+
+      usb_forward::forward(std::shared_ptr<usb_forward::ssl_socket_t>(std::move(socket)), busid->second, named_cert_p->name);
     };
 
     https_server.default_resource["GET"] = not_found<SunshineHTTPS>;

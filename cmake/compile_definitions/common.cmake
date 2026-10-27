@@ -90,6 +90,8 @@ set(SUNSHINE_TARGET_FILES
         "${CMAKE_SOURCE_DIR}/src/stream.cpp"
         "${CMAKE_SOURCE_DIR}/src/auto_bitrate.cpp"
         "${CMAKE_SOURCE_DIR}/src/auto_bitrate.h"
+        "${CMAKE_SOURCE_DIR}/src/usb_forward.cpp"
+        "${CMAKE_SOURCE_DIR}/src/usb_forward.h"
         "${CMAKE_SOURCE_DIR}/src/stream.h"
         "${CMAKE_SOURCE_DIR}/src/video.cpp"
         "${CMAKE_SOURCE_DIR}/src/video.h"

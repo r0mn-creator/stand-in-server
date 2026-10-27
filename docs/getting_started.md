@@ -374,7 +374,7 @@ After installation, some initial setup is required.
 
 ##### Enable
 ```bash
-sudo setcap cap_sys_admin+p $(readlink -f $(which sunshine))
+sudo setcap cap_sys_admin,cap_dac_override+p $(readlink -f $(which sunshine))
 ```
 
 #### X11 Capture

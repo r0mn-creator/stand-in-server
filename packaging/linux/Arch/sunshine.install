@@ -1,5 +1,5 @@
 do_setcap() {
-  setcap cap_sys_admin+p $(readlink -f usr/bin/sunshine)
+  setcap cap_sys_admin,cap_dac_override+p $(readlink -f usr/bin/sunshine)
 }
 
 do_udev_reload() {
@@ -8,6 +8,7 @@ do_udev_reload() {
   udevadm trigger --property-match=DEVNAME=/dev/uhid
   modprobe uinput || true
   modprobe uhid || true
+  modprobe vhci-hcd || true
 }
 
 post_install() {
