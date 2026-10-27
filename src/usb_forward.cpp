@@ -12,6 +12,8 @@
 
 // platform includes
 #ifdef __linux__
+  #include <netinet/in.h>
+  #include <netinet/tcp.h>
   #include <poll.h>
   #include <sys/capability.h>
   #include <sys/socket.h>
@@ -229,6 +231,40 @@ namespace usb_forward {
     }
   }
 
+  /**
+   * @brief A connected pair of loopback TCP sockets; vhci-hcd only takes TCP sockets.
+   * @return 0 on success.
+   */
+  static int tcp_loopback_pair(int pair[2]) {
+    int listener = socket(AF_INET, SOCK_STREAM, 0);
+    if (listener < 0) {
+      return -1;
+    }
+
+    sockaddr_in addr {};
+    addr.sin_family = AF_INET;
+    addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
+    socklen_t len = sizeof(addr);
+    int result = -1;
+    if (!bind(listener, (sockaddr *) &addr, sizeof(addr)) && !listen(listener, 1) && !getsockname(listener, (sockaddr *) &addr, &len)) {
+      pair[0] = socket(AF_INET, SOCK_STREAM, 0);
+      if (pair[0] >= 0 && !connect(pair[0], (sockaddr *) &addr, sizeof(addr))) {
+        pair[1] = accept(listener, nullptr, nullptr);
+        if (pair[1] >= 0) {
+          int one = 1;
+          setsockopt(pair[0], IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+          setsockopt(pair[1], IPPROTO_TCP, TCP_NODELAY, &one, sizeof(one));
+          result = 0;
+        }
+      }
+      if (result && pair[0] >= 0) {
+        close(pair[0]);
+      }
+    }
+    close(listener);
+    return result;
+  }
+
   static void attach_and_pump(SSL *ssl, int tls_fd, const usb_device_t &device, const std::string &label) {
     if (access(vhci_path, F_OK)) {
       BOOST_LOG(error) << "USB forward: the vhci-hcd kernel module isn't loaded"sv;
@@ -243,8 +279,8 @@ namespace usb_forward {
 
     // The kernel speaks USB/IP on one end of this pair, we relay the other end
     int pair[2];
-    if (socketpair(AF_UNIX, SOCK_STREAM, 0, pair)) {
-      BOOST_LOG(error) << "USB forward: socketpair() failed: "sv << std::strerror(errno);
+    if (tcp_loopback_pair(pair)) {
+      BOOST_LOG(error) << "USB forward: couldn't create a loopback connection: "sv << std::strerror(errno);
       return;
     }
 
@@ -285,6 +321,11 @@ namespace usb_forward {
 
       auto ssl = socket->native_handle();
       auto tls_fd = socket->lowest_layer().native_handle();
+
+      // Asio runs TLS through an in-memory BIO pair that only its own async
+      // operations drain; point the session straight at the socket instead.
+      // The client waits for our reply, so nothing is left buffered in Asio.
+      SSL_set_fd(ssl, tls_fd);
 
       constexpr auto response = "HTTP/1.1 101 Switching Protocols\r\nUpgrade: stand-in-usb\r\nConnection: Upgrade\r\n\r\n"sv;
       if (!ssl_write_all(ssl, response.data(), response.size())) {
