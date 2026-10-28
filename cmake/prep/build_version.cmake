@@ -27,7 +27,7 @@ if((DEFINED ENV{BRANCH}) AND (DEFINED ENV{BUILD_VERSION}))  # cmake-lint: disabl
         set(CMAKE_PROJECT_VERSION ${PROJECT_VERSION})  # cpack will use this to set the binary versions
     endif()
 else()
-    # Generate Sunshine Version based of the git tag
+    # Generate the version based on the git tag
     # https://github.com/nocnokneo/cmake-git-versioning-example/blob/master/LICENSE
     find_package(Git)
     if(GIT_EXECUTABLE)
@@ -54,10 +54,10 @@ else()
                 OUTPUT_STRIP_TRAILING_WHITESPACE
         )
         if(NOT GIT_DESCRIBE_ERROR_CODE)
-            MESSAGE("Sunshine Branch: ${GIT_DESCRIBE_BRANCH}")
+            MESSAGE("Git Branch: ${GIT_DESCRIBE_BRANCH}")
             if(NOT GIT_DESCRIBE_BRANCH STREQUAL "master")
                 set(PROJECT_VERSION ${PROJECT_VERSION}.${GIT_DESCRIBE_VERSION})
-                MESSAGE("Sunshine Version: ${GIT_DESCRIBE_VERSION}")
+                MESSAGE("Git Version: ${GIT_DESCRIBE_VERSION}")
             endif()
             if(GIT_IS_DIRTY)
                 set(PROJECT_VERSION ${PROJECT_VERSION}.dirty)
@@ -133,7 +133,7 @@ message("PROJECT_YEAR: ${PROJECT_YEAR}")
 message("PROJECT_MONTH: ${PROJECT_MONTH}")
 message("PROJECT_DAY: ${PROJECT_DAY}")
 
-list(APPEND SUNSHINE_DEFINITIONS PROJECT_NAME="${PROJECT_NAME}")
+list(APPEND SUNSHINE_DEFINITIONS PROJECT_NAME="${PROJECT_DISPLAY_NAME}")
 list(APPEND SUNSHINE_DEFINITIONS PROJECT_VERSION="${PROJECT_VERSION}")
 list(APPEND SUNSHINE_DEFINITIONS PROJECT_VERSION_MAJOR="${PROJECT_VERSION_MAJOR}")
 list(APPEND SUNSHINE_DEFINITIONS PROJECT_VERSION_MINOR="${PROJECT_VERSION_MINOR}")

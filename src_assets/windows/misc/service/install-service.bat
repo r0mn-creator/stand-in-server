@@ -1,7 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
 
-rem Get sunshine root directory
+rem Get the install root directory
 for %%I in ("%~dp0\..") do set "ROOT_DIR=%%~fI"
 
 set SERVICE_NAME=ApolloService
@@ -16,7 +16,7 @@ rem Remove the legacy SunshineSvc service
 net stop sunshinesvc
 sc delete sunshinesvc
 
-rem Check if ApolloService already exists
+rem Check if the service already exists
 sc qc %SERVICE_NAME% > nul 2>&1
 if %ERRORLEVEL%==0 (
     rem Stop the existing service if running
@@ -58,10 +58,10 @@ if exist "%SERVICE_CONFIG_FILE%" (
 echo Setting service start type set to: [!SERVICE_START_TYPE!]
 
 rem Run the sc command to create/reconfigure the service
-sc %SC_CMD% %SERVICE_NAME% binPath= "\"%SERVICE_BIN%\"" start= %SERVICE_START_TYPE% DisplayName= "Apollo Service"
+sc %SC_CMD% %SERVICE_NAME% binPath= "\"%SERVICE_BIN%\"" start= %SERVICE_START_TYPE% DisplayName= "Stand-In Server"
 
 rem Set the description of the service
-sc description %SERVICE_NAME% "Apollo is a self-hosted game stream host for Moonlight."
+sc description %SERVICE_NAME% "Stand-In Server is a self-hosted game stream host for Stand-In and Moonlight clients."
 
 rem Start the new service
 net start %SERVICE_NAME%

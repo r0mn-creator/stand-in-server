@@ -16,7 +16,7 @@ if(${SUNSHINE_BUILD_APPIMAGE} OR ${SUNSHINE_BUILD_FLATPAK})
             DESTINATION "${SUNSHINE_ASSETS_DIR}/udev/rules.d")
     install(FILES "${SUNSHINE_SOURCE_ASSETS_DIR}/linux/misc/60-sunshine.conf"
             DESTINATION "${SUNSHINE_ASSETS_DIR}/modules-load.d")
-    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sunshine.service"
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/stand-in-server.service"
             DESTINATION "${SUNSHINE_ASSETS_DIR}/systemd/user")
 else()
     find_package(Systemd)
@@ -27,7 +27,7 @@ else()
                 DESTINATION "${UDEV_RULES_INSTALL_DIR}")
     endif()
     if(SYSTEMD_FOUND)
-        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/sunshine.service"
+        install(FILES "${CMAKE_CURRENT_BINARY_DIR}/stand-in-server.service"
                 DESTINATION "${SYSTEMD_USER_UNIT_INSTALL_DIR}")
         install(FILES "${SUNSHINE_SOURCE_ASSETS_DIR}/linux/misc/60-sunshine.conf"
                 DESTINATION "${SYSTEMD_MODULES_LOAD_DIR}")
@@ -98,10 +98,11 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS OFF)
 
 # application icon
 if(NOT ${SUNSHINE_BUILD_FLATPAK})
-    install(FILES "${CMAKE_SOURCE_DIR}/apollo.svg"
-            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps")
+    install(FILES "${CMAKE_SOURCE_DIR}/stand-in-brand/app-icon.svg"
+            DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps"
+            RENAME "stand-in-server.svg")
 else()
-    install(FILES "${CMAKE_SOURCE_DIR}/apollo.svg"
+    install(FILES "${CMAKE_SOURCE_DIR}/stand-in-brand/app-icon.svg"
             DESTINATION "${CMAKE_INSTALL_DATAROOTDIR}/icons/hicolor/scalable/apps"
             RENAME "${PROJECT_FQDN}.svg")
 endif()

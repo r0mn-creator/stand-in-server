@@ -1,6 +1,6 @@
 [Desktop Entry]
-Name=@PROJECT_NAME@
-Exec=sunshine
+Name=@PROJECT_DISPLAY_NAME@
+Exec=stand-in-server
 Terminal=true
 Type=Application
 NoDisplay=true

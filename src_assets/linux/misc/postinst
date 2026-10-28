@@ -12,14 +12,14 @@ modprobe vhci-hcd || echo "warning: vhci-hcd not available, USB forwarding will 
 if [ ! -x "$(command -v rpm-ostree)" ]; then
   echo "Not in an rpm-ostree environment, proceeding with post install steps."
 
-  # Ensure Sunshine can grab images from KMS
+  # Ensure the server can grab images from KMS
   path_to_setcap=$(which setcap)
-  path_to_sunshine=$(readlink -f "$(which sunshine)")
+  path_to_server=$(readlink -f "$(which stand-in-server)")
   if [ -x "$path_to_setcap" ] ; then
-    echo "Setting CAP_SYS_ADMIN (screen capture) and CAP_DAC_OVERRIDE (USB forwarding) capabilities on Sunshine binary."
-    echo "$path_to_setcap cap_sys_admin,cap_dac_override+p $path_to_sunshine"
-    $path_to_setcap cap_sys_admin,cap_dac_override+p $path_to_sunshine
-    echo "Capabilities set on Sunshine binary."
+    echo "Setting CAP_SYS_ADMIN (screen capture) and CAP_DAC_OVERRIDE (USB forwarding) capabilities on the Stand-In Server binary."
+    echo "$path_to_setcap cap_sys_admin,cap_dac_override+p $path_to_server"
+    $path_to_setcap cap_sys_admin,cap_dac_override+p $path_to_server
+    echo "Capabilities set on the Stand-In Server binary."
   else
     echo "error: setcap not found or not executable."
   fi

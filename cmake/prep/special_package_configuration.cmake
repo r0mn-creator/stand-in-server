@@ -10,7 +10,7 @@ if(APPLE)
     endif()
 elseif(UNIX)
     # configure the .desktop file
-    set(SUNSHINE_DESKTOP_ICON "apollo.svg")
+    set(SUNSHINE_DESKTOP_ICON "stand-in-server")
     if(${SUNSHINE_BUILD_APPIMAGE})
         configure_file(packaging/linux/AppImage/${PROJECT_FQDN}.desktop ${PROJECT_FQDN}.desktop @ONLY)
     elseif(${SUNSHINE_BUILD_FLATPAK})
@@ -25,7 +25,7 @@ elseif(UNIX)
     configure_file(packaging/linux/${PROJECT_FQDN}.metainfo.xml ${PROJECT_FQDN}.metainfo.xml @ONLY)
 
     # configure service
-    configure_file(packaging/linux/sunshine.service.in sunshine.service @ONLY)
+    configure_file(packaging/linux/stand-in-server.service.in stand-in-server.service @ONLY)
 
     # configure the arch linux pkgbuild
     if(${SUNSHINE_CONFIGURE_PKGBUILD})
