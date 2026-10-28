@@ -50,6 +50,8 @@ namespace rtsp_stream {
     bool enable_sops;
     bool virtual_display;
     uint32_t scale_factor;
+    // Stand-In clients send autoBitrate=0 when the user fixed the bitrate by hand
+    bool auto_bitrate;
 
     std::optional<crypto::cipher::gcm_t> rtsp_cipher;
     std::string rtsp_url_scheme;

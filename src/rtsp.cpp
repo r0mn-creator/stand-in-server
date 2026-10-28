@@ -1134,7 +1134,7 @@ namespace rtsp_stream {
     }
 
     // The client's bitrate becomes the ceiling; start at what held up last time
-    if (config::video.auto_bitrate && !session.input_only) {
+    if (config::video.auto_bitrate && session.auto_bitrate && !session.input_only) {
       boost::system::error_code ec;
       auto client_endpoint = sock.remote_endpoint(ec);
       if (!ec) {
