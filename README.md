@@ -19,21 +19,20 @@ Stand-In has three parts:
 - Automatic bitrate: lowers quality when the network struggles and raises it again when
   it recovers, remembered per client and network
 - USB device forwarding (USB/IP) from Stand-In clients
-- Works with stock Moonlight clients too; Stand-In extras switch on only for Stand-In clients
+- Stays compatible with Moonlight clients; Stand-In features switch on only for Stand-In clients
 
 ## Building
 
-Same steps as Sunshine/Apollo: see `docs/building.md`. Clone with `--recursive`.
+See `docs/building.md`. Clone with `--recursive`.
 
 ## Credits and licence
 
-Stand-In is free software under the GNU GPL v3 (see `LICENSE`). It is a new project
-built on the work of others:
+Stand-In is its own project. It started from open-source streaming software and has
+evolved into something different, but it owes a lot to these projects and keeps their
+licence, the GNU GPL v3 (see `LICENSE`). Their copyright notices stay in the source.
 
 - [Moonlight](https://moonlight-stream.org) (moonlight-qt, moonlight-android, moonlight-common-c)
 - [Artemis](https://github.com/ClassicOldSong/moonlight-android) by ClassicOldSong
 - [Apollo](https://github.com/ClassicOldSong/Apollo) by ClassicOldSong, itself built on
   [Sunshine](https://github.com/LizardByte/Sunshine) by LizardByte
 - [Inter](https://rsms.me/inter/) typeface by Rasmus Andersson (SIL OFL)
-
-The original project's README is kept as `README.upstream.md`.
