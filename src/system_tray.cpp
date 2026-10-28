@@ -10,7 +10,7 @@
     #include <accctrl.h>
     #include <aclapi.h>
     #include "platform/windows/utils.h"
-    #define TRAY_ICON WEB_DIR "images/apollo.ico"
+    #define TRAY_ICON WEB_DIR "images/stand-in-tray.ico"
     #define TRAY_ICON_PLAYING WEB_DIR "images/apollo-playing.ico"
     #define TRAY_ICON_PAUSING WEB_DIR "images/apollo-pausing.ico"
     #define TRAY_ICON_LOCKED WEB_DIR "images/apollo-locked.ico"
