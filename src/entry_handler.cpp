@@ -211,7 +211,7 @@ namespace service_ctrl {
   bool start_service() {
     service_controller sc {SERVICE_QUERY_STATUS | SERVICE_START};
 
-    std::cout << "Starting Sunshine..."sv;
+    std::cout << "Starting Stand-In Server..."sv;
 
     // This operation is asynchronous, so we must wait for it to complete
     if (!sc.start_service()) {

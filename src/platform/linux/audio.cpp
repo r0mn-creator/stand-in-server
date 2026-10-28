@@ -90,7 +90,7 @@ namespace platf {
     int status;
 
     mic->mic.reset(
-      pa_simple_new(nullptr, "sunshine", pa_stream_direction_t::PA_STREAM_RECORD, source_name.c_str(), "sunshine-record", &ss, &pa_map, &pa_attr, &status)
+      pa_simple_new(nullptr, "Stand-In Server", pa_stream_direction_t::PA_STREAM_RECORD, source_name.c_str(), "stand-in-server-record", &ss, &pa_map, &pa_attr, &status)
     );
 
     if (!mic->mic) {
@@ -201,7 +201,7 @@ namespace platf {
       int init() {
         events = std::make_unique<safe::event_t<ctx_event_e>>();
         loop.reset(pa_mainloop_new());
-        ctx.reset(pa_context_new(pa_mainloop_get_api(loop.get()), "sunshine"));
+        ctx.reset(pa_context_new(pa_mainloop_get_api(loop.get()), "Stand-In Server"));
 
         events_cb = std::make_unique<std::function<void(ctx_t::pointer)>>([this](ctx_t::pointer ctx) {
           switch (pa_context_get_state(ctx)) {

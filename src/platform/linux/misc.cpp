@@ -863,7 +863,7 @@ std::string get_local_ip_for_gateway() {
       return boost::asio::ip::host_name();
     } catch (boost::system::system_error &err) {
       BOOST_LOG(error) << "Failed to get hostname: "sv << err.what();
-      return "Sunshine"s;
+      return "Stand-In Server"s;
     }
   }
 
@@ -1003,7 +1003,7 @@ std::string get_local_ip_for_gateway() {
 #if defined(SUNSHINE_BUILD_X11) || defined(SUNSHINE_BUILD_CUDA)
     if (std::getenv("DISPLAY") && window_system != window_system_e::WAYLAND) {
       if (std::getenv("WAYLAND_DISPLAY")) {
-        BOOST_LOG(warning) << "Wayland detected, yet sunshine will use X11 for screencasting, screencasting will only work on XWayland applications"sv;
+        BOOST_LOG(warning) << "Wayland detected, yet the server will use X11 for screencasting, screencasting will only work on XWayland applications"sv;
       }
 
       window_system = window_system_e::X11;

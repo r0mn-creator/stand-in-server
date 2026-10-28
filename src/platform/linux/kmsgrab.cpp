@@ -1634,9 +1634,7 @@ namespace platf {
         if (!fb->handles[0]) {
           BOOST_LOG(error) << "Couldn't get handle for DRM Framebuffer ["sv << plane->fb_id << "]: Probably not permitted"sv;
           BOOST_LOG((window_system != window_system_e::X11 || config::video.capture == "kms") ? fatal : error)
-            << "You must run [sudo setcap cap_sys_admin,cap_dac_override+p $(readlink -f $(which sunshine))] for KMS display capture to work!\n"sv
-            << "If you installed from AppImage or Flatpak, please refer to the official documentation:\n"sv
-            << "https://docs.lizardbyte.dev/projects/sunshine/latest/md_docs_2getting__started.html#linux"sv;
+            << "You must run [sudo setcap cap_sys_admin,cap_dac_override+p $(readlink -f $(which stand-in-server))] for KMS display capture to work!"sv;
           break;
         }
 

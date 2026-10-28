@@ -301,7 +301,7 @@ int main(int argc, char *argv[]) {
     BOOST_LOG(info) << "Interrupt handler called"sv;
 
     auto task = []() {
-      BOOST_LOG(fatal) << "10 seconds passed, yet Sunshine's still running: Forcing shutdown"sv;
+      BOOST_LOG(fatal) << "10 seconds passed, yet the server is still running: Forcing shutdown"sv;
       logging::log_flush();
       lifetime::debug_trap();
     };
@@ -318,7 +318,7 @@ int main(int argc, char *argv[]) {
     BOOST_LOG(info) << "Terminate handler called"sv;
 
     auto task = []() {
-      BOOST_LOG(fatal) << "10 seconds passed, yet Sunshine's still running: Forcing shutdown"sv;
+      BOOST_LOG(fatal) << "10 seconds passed, yet the server is still running: Forcing shutdown"sv;
       logging::log_flush();
       lifetime::debug_trap();
     };
@@ -403,7 +403,7 @@ int main(int argc, char *argv[]) {
     BOOST_LOG(fatal) << "HTTP interface failed to initialize"sv;
 
 #ifdef _WIN32
-    BOOST_LOG(fatal) << "To relaunch Apollo successfully, use the shortcut in the Start Menu. Do not run sunshine.exe manually."sv;
+    BOOST_LOG(fatal) << "To relaunch Stand-In Server successfully, use the shortcut in the Start Menu. Do not run stand-in-server.exe manually."sv;
     std::this_thread::sleep_for(10s);
 #endif
 
@@ -434,8 +434,8 @@ int main(int argc, char *argv[]) {
 #ifdef _WIN32
   // If we're using the default port and GameStream is enabled, warn the user
   if (config::sunshine.port == 47989 && is_gamestream_enabled()) {
-    BOOST_LOG(fatal) << "GameStream is still enabled in GeForce Experience! This *will* cause streaming problems with Apollo!"sv;
-    BOOST_LOG(fatal) << "Disable GameStream on the SHIELD tab in GeForce Experience or change the Port setting on the Advanced tab in the Apollo Web UI."sv;
+    BOOST_LOG(fatal) << "GameStream is still enabled in GeForce Experience! This *will* cause streaming problems with Stand-In Server!"sv;
+    BOOST_LOG(fatal) << "Disable GameStream on the SHIELD tab in GeForce Experience or change the Port setting on the Advanced tab in the Stand-In Server Web UI."sv;
   }
 #endif
 
