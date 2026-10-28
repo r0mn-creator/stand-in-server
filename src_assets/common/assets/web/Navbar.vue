@@ -1,8 +1,9 @@
 <template>
   <nav class="navbar navbar-light navbar-expand-lg navbar-background header">
     <div class="container">
-      <a class="navbar-brand" href="./" title="Apollo">
-        <img src="/images/logo-apollo-45.png" height="45" alt="Apollo">
+      <a class="navbar-brand" href="./" title="Stand-In Server">
+        <img src="/images/logo-apollo-45.png" height="45" alt="">
+        <span class="ms-2 align-middle">Stand-In Server</span>
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent"
               aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
