@@ -54,6 +54,15 @@ namespace proc {
 
   proc_t proc;
 
+  /**
+   * @brief Set a per-app environment variable under the STAND_IN_ prefix,
+   *        and under the legacy APOLLO_ prefix so existing scripts keep working.
+   */
+  static void set_app_env(boost::process::v1::environment &env, const std::string &suffix, const std::string &value) {
+    env["STAND_IN_" + suffix] = value;
+    env["APOLLO_" + suffix] = value;
+  }
+
   int input_only_app_id = -1;
   std::string input_only_app_id_str;
   int terminate_app_id = -1;
@@ -366,7 +375,7 @@ namespace proc {
     fps_str = fps_buf;
 
     // Add Stream-specific environment variables
-    // Sunshine Compatibility
+    // Legacy names, kept for compatibility with older scripts
     _env["SUNSHINE_APP_ID"] = _app.id;
     _env["SUNSHINE_APP_NAME"] = _app.name;
     _env["SUNSHINE_CLIENT_WIDTH"] = std::to_string(render_width);
@@ -377,40 +386,40 @@ namespace proc {
     _env["SUNSHINE_CLIENT_HOST_AUDIO"] = launch_session->host_audio ? "true" : "false";
     _env["SUNSHINE_CLIENT_ENABLE_SOPS"] = launch_session->enable_sops ? "true" : "false";
 
-    _env["APOLLO_APP_ID"] = _app.id;
-    _env["APOLLO_APP_NAME"] = _app.name;
-    _env["APOLLO_APP_UUID"] = _app.uuid;
-    _env["APOLLO_APP_STATUS"] = "STARTING";
-    _env["APOLLO_CLIENT_UUID"] = launch_session->unique_id;
-    _env["APOLLO_CLIENT_NAME"] = launch_session->device_name;
-    _env["APOLLO_CLIENT_WIDTH"] = std::to_string(render_width);
-    _env["APOLLO_CLIENT_HEIGHT"] = std::to_string(render_height);
-    _env["APOLLO_CLIENT_RENDER_WIDTH"] = std::to_string(launch_session->width);
-    _env["APOLLO_CLIENT_RENDER_HEIGHT"] = std::to_string(launch_session->height);
-    _env["APOLLO_CLIENT_SCALE_FACTOR"] = std::to_string(scale_factor);
-    _env["APOLLO_CLIENT_FPS"] = fps_str;
-    _env["APOLLO_CLIENT_HDR"] = launch_session->enable_hdr ? "true" : "false";
-    _env["APOLLO_CLIENT_GCMAP"] = std::to_string(launch_session->gcmap);
-    _env["APOLLO_CLIENT_HOST_AUDIO"] = launch_session->host_audio ? "true" : "false";
-    _env["APOLLO_CLIENT_ENABLE_SOPS"] = launch_session->enable_sops ? "true" : "false";
+    set_app_env(_env, "APP_ID", _app.id);
+    set_app_env(_env, "APP_NAME", _app.name);
+    set_app_env(_env, "APP_UUID", _app.uuid);
+    set_app_env(_env, "APP_STATUS", "STARTING");
+    set_app_env(_env, "CLIENT_UUID", launch_session->unique_id);
+    set_app_env(_env, "CLIENT_NAME", launch_session->device_name);
+    set_app_env(_env, "CLIENT_WIDTH", std::to_string(render_width));
+    set_app_env(_env, "CLIENT_HEIGHT", std::to_string(render_height));
+    set_app_env(_env, "CLIENT_RENDER_WIDTH", std::to_string(launch_session->width));
+    set_app_env(_env, "CLIENT_RENDER_HEIGHT", std::to_string(launch_session->height));
+    set_app_env(_env, "CLIENT_SCALE_FACTOR", std::to_string(scale_factor));
+    set_app_env(_env, "CLIENT_FPS", fps_str);
+    set_app_env(_env, "CLIENT_HDR", launch_session->enable_hdr ? "true" : "false");
+    set_app_env(_env, "CLIENT_GCMAP", std::to_string(launch_session->gcmap));
+    set_app_env(_env, "CLIENT_HOST_AUDIO", launch_session->host_audio ? "true" : "false");
+    set_app_env(_env, "CLIENT_ENABLE_SOPS", launch_session->enable_sops ? "true" : "false");
 
     int channelCount = launch_session->surround_info & 65535;
     switch (channelCount) {
       case 2:
         _env["SUNSHINE_CLIENT_AUDIO_CONFIGURATION"] = "2.0";
-        _env["APOLLO_CLIENT_AUDIO_CONFIGURATION"] = "2.0";
+        set_app_env(_env, "CLIENT_AUDIO_CONFIGURATION", "2.0");
         break;
       case 6:
         _env["SUNSHINE_CLIENT_AUDIO_CONFIGURATION"] = "5.1";
-        _env["APOLLO_CLIENT_AUDIO_CONFIGURATION"] = "5.1";
+        set_app_env(_env, "CLIENT_AUDIO_CONFIGURATION", "5.1");
         break;
       case 8:
         _env["SUNSHINE_CLIENT_AUDIO_CONFIGURATION"] = "7.1";
-        _env["APOLLO_CLIENT_AUDIO_CONFIGURATION"] = "7.1";
+        set_app_env(_env, "CLIENT_AUDIO_CONFIGURATION", "7.1");
         break;
     }
     _env["SUNSHINE_CLIENT_AUDIO_SURROUND_PARAMS"] = launch_session->surround_params;
-    _env["APOLLO_CLIENT_AUDIO_SURROUND_PARAMS"] = launch_session->surround_params;
+    set_app_env(_env, "CLIENT_AUDIO_SURROUND_PARAMS", launch_session->surround_params);
 
     if (!_app.output.empty() && _app.output != "null"sv) {
 #ifdef _WIN32
@@ -463,7 +472,7 @@ namespace proc {
       }
     }
 
-    _env["APOLLO_APP_STATUS"] = "RUNNING";
+    set_app_env(_env, "APP_STATUS", "RUNNING");
 
     for (auto &cmd : _app.detached) {
       boost::filesystem::path working_dir = _app.working_dir.empty() ?
@@ -607,7 +616,7 @@ namespace proc {
     if (!_app.state_cmds.empty()) {
       auto exec_thread = std::thread([cmd_list = _app.state_cmds, app_working_dir = _app.working_dir, _env = _env]() mutable {
 
-        _env["APOLLO_APP_STATUS"] = "RESUMING";
+        set_app_env(_env, "APP_STATUS", "RESUMING");
 
         std::error_code ec;
         auto _state_resume_it = std::begin(cmd_list);
@@ -661,7 +670,7 @@ namespace proc {
 
     if (!_app.state_cmds.empty()) {
       auto exec_thread = std::thread([cmd_list = _app.state_cmds, app_working_dir = _app.working_dir, _env = _env]() mutable {
-        _env["APOLLO_APP_STATUS"] = "PAUSING";
+        set_app_env(_env, "APP_STATUS", "PAUSING");
 
         std::error_code ec;
         auto _state_pause_it = std::begin(cmd_list);
@@ -714,7 +723,7 @@ namespace proc {
     _process = boost::process::v1::child();
     _process_group = boost::process::v1::group();
 
-    _env["APOLLO_APP_STATUS"] = "TERMINATING";
+    set_app_env(_env, "APP_STATUS", "TERMINATING");
 
     for (; _app_prep_it != _app_prep_begin; --_app_prep_it) {
       auto &cmd = *(_app_prep_it - 1);

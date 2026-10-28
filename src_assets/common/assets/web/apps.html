@@ -420,88 +420,79 @@
               <td><b></b></td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_APP_ID</td>
+              <td style="font-family: monospace">STAND_IN_APP_ID</td>
               <td>{{ $t('apps.env_app_id') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_APP_NAME</td>
+              <td style="font-family: monospace">STAND_IN_APP_NAME</td>
               <td>{{ $t('apps.env_app_name') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_APP_UUID</td>
+              <td style="font-family: monospace">STAND_IN_APP_UUID</td>
               <td>{{ $t('apps.env_app_uuid') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_APP_STATUS</td>
+              <td style="font-family: monospace">STAND_IN_APP_STATUS</td>
               <td>{{ $t('apps.env_app_status') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_UUID</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_UUID</td>
               <td>{{ $t('apps.env_client_uuid') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_NAME</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_NAME</td>
               <td>{{ $t('apps.env_client_name') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_WIDTH</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_WIDTH</td>
               <td>{{ $t('apps.env_client_width') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_HEIGHT</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_HEIGHT</td>
               <td>{{ $t('apps.env_client_height') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_FPS</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_FPS</td>
               <td>{{ $t('apps.env_client_fps') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_HDR</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_HDR</td>
               <td>{{ $t('apps.env_client_hdr') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_GCMAP</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_GCMAP</td>
               <td>{{ $t('apps.env_client_gcmap') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_HOST_AUDIO</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_HOST_AUDIO</td>
               <td>{{ $t('apps.env_client_host_audio') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_ENABLE_SOPS</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_ENABLE_SOPS</td>
               <td>{{ $t('apps.env_client_enable_sops') }}</td>
             </tr>
             <tr>
-              <td style="font-family: monospace">APOLLO_CLIENT_AUDIO_CONFIGURATION</td>
+              <td style="font-family: monospace">STAND_IN_CLIENT_AUDIO_CONFIGURATION</td>
               <td>{{ $t('apps.env_client_audio_config') }}</td>
             </tr>
           </table>
 
           <template v-if="platform === 'windows'">
             <div class="form-text"><b>{{ $t('apps.env_rtss_cli_example') }}</b>
-              <pre>cmd /C \path\to\rtss-cli.exe limit:set %APOLLO_CLIENT_FPS%</pre>
+              <pre>cmd /C \path\to\rtss-cli.exe limit:set %STAND_IN_CLIENT_FPS%</pre>
             </div>
           </template>
           <template v-if="platform === 'linux'">
             <div class="form-text"><b>{{ $t('apps.env_xrandr_example') }}</b>
-              <pre>sh -c "xrandr --output HDMI-1 --mode \"${APOLLO_CLIENT_WIDTH}x${APOLLO_CLIENT_HEIGHT}\" --rate ${APOLLO_CLIENT_FPS}"</pre>
+              <pre>sh -c "xrandr --output HDMI-1 --mode \"${STAND_IN_CLIENT_WIDTH}x${STAND_IN_CLIENT_HEIGHT}\" --rate ${STAND_IN_CLIENT_FPS}"</pre>
             </div>
           </template>
           <template v-if="platform === 'macos'">
             <div class="form-text"><b>{{ $t('apps.env_displayplacer_example') }}</b>
-              <pre>sh -c "displayplacer "id:&lt;screenId&gt; res:${APOLLO_CLIENT_WIDTH}x${APOLLO_CLIENT_HEIGHT} hz:${APOLLO_CLIENT_FPS} scaling:on origin:(0,0) degree:0""</pre>
+              <pre>sh -c "displayplacer "id:&lt;screenId&gt; res:${STAND_IN_CLIENT_WIDTH}x${STAND_IN_CLIENT_HEIGHT} hz:${STAND_IN_CLIENT_FPS} scaling:on origin:(0,0) degree:0""</pre>
             </div>
           </template>
 
-          <div class="form-text">
-            <a
-              href="https://docs.lizardbyte.dev/projects/sunshine/latest/md_docs_2app__examples.html"
-              target="_blank"
-              class="text-decoration-none"
-            >
-              {{ $t('_common.see_more') }}
-            </a>
-          </div>
         </div>
 
         <div class="alert alert-info">
@@ -759,8 +750,8 @@
       exportLauncherFile(app) {
         const link = document.createElement('a');
         const fileContent = `# Artemis app entry
-# Exported by Apollo
-# https://github.com/ClassicOldSong/Apollo
+# Exported by Stand-In Server
+# https://github.com/r0mn-creator/stand-in-server
 
 [host_uuid] ${this.hostUUID}
 [host_name] ${this.hostName}
