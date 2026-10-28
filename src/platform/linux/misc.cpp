@@ -151,7 +151,7 @@ namespace platf {
         config_base = fs::path(homedir) / ".config"sv;
       }
 
-      // Builds before the rename used a directory called "sunshine"; move it over once.
+      // Builds before the rename used a directory called "sunshine"; copy it over once.
       config_path = file_handler::migrate_config_dir(config_base / "sunshine"sv, config_base / "stand-in-server"sv);
 
       // migrate from the old config location if necessary

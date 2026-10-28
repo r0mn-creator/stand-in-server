@@ -92,7 +92,7 @@ namespace platf {
       homedir = getpwuid(geteuid())->pw_dir;
     }
 
-    // Builds before the rename used ~/.config/sunshine; move it over once.
+    // Builds before the rename used ~/.config/sunshine; copy it over once.
     static const fs::path config_path = file_handler::migrate_config_dir(
       fs::path {homedir} / ".config/sunshine"sv,
       fs::path {homedir} / ".config/stand-in-server"sv

@@ -95,31 +95,32 @@ namespace file_handler {
       return config_path;
     }
 
-    std::cout << "Moving config from " << legacy_path << " to " << config_path << std::endl;
+    std::cout << "Copying config from " << legacy_path << " to " << config_path << std::endl;
 
     if (config_path.has_parent_path()) {
       fs::create_directories(config_path.parent_path(), ec);
       ec.clear();
     }
 
-    fs::rename(legacy_path, config_path, ec);
+    // Copy into a staging directory and rename it into place, so an interrupted
+    // copy never leaves a half-filled config directory behind.
+    // The legacy directory is left untouched: it may belong to a Sunshine or Apollo install.
+    auto staging_path = config_path;
+    staging_path += ".migrating";
+    std::error_code ignored;
+    fs::remove_all(staging_path, ignored);
+
+    fs::copy(legacy_path, staging_path, fs::copy_options::recursive | fs::copy_options::copy_symlinks, ec);
+    if (!ec) {
+      fs::rename(staging_path, config_path, ec);
+    }
     if (ec) {
-      // Different filesystems: copy, then remove the original
-      ec.clear();
-      fs::copy(legacy_path, config_path, fs::copy_options::recursive | fs::copy_options::copy_symlinks, ec);
-      if (ec) {
-        std::cerr << "Config migration failed: " << ec.message() << ". Still using " << legacy_path << std::endl;
-        std::error_code ignored;
-        fs::remove_all(config_path, ignored);
-        return legacy_path;
-      }
-      fs::remove_all(legacy_path, ec);
-      if (ec) {
-        std::cerr << "Copied config, but could not remove " << legacy_path << ": " << ec.message() << std::endl;
-      }
+      std::cerr << "Config migration failed: " << ec.message() << ". Using " << legacy_path << " for now" << std::endl;
+      fs::remove_all(staging_path, ignored);
+      return legacy_path;
     }
 
-    // Covers and other files can be stored with absolute paths
+    // Covers and other files can be stored with absolute paths; fix them in the copy only
     const auto from = legacy_path.string() + "/";
     const auto to = config_path.string() + "/";
     rewrite_paths_in_file(config_path / "apps.json", from, to);
