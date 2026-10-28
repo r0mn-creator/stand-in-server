@@ -5,6 +5,7 @@
 #pragma once
 
 // standard includes
+#include <filesystem>
 #include <string>
 
 /**
@@ -51,4 +52,20 @@ namespace file_handler {
    * @examples_end
    */
   int write_file(const char *path, const std::string_view &contents);
+
+  /**
+   * @brief Move a config directory from its legacy location, once.
+   *
+   * Builds before the rename to Stand-In Server kept their config (pairing state,
+   * credentials, apps, covers) in a directory named after Sunshine. If the new
+   * directory does not exist yet and the legacy one does, the legacy directory is
+   * moved over, and absolute paths inside apps.json and sunshine.conf are rewritten
+   * to point at the new location.
+   *
+   * Runs before logging is initialized, so it reports on stdout/stderr.
+   * @param legacy_path The legacy config directory.
+   * @param config_path The config directory to use from now on.
+   * @return The directory to use: `config_path`, or `legacy_path` if the move failed.
+   */
+  std::filesystem::path migrate_config_dir(const std::filesystem::path &legacy_path, const std::filesystem::path &config_path);
 }  // namespace file_handler

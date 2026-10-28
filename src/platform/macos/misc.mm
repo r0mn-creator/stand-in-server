@@ -28,6 +28,7 @@
 // local includes
 #include "misc.h"
 #include "src/entry_handler.h"
+#include "src/file_handler.h"
 #include "src/logging.h"
 #include "src/platform/common.h"
 
@@ -91,7 +92,12 @@ namespace platf {
       homedir = getpwuid(geteuid())->pw_dir;
     }
 
-    return fs::path {homedir} / ".config/sunshine"sv;
+    // Builds before the rename used ~/.config/sunshine; move it over once.
+    static const fs::path config_path = file_handler::migrate_config_dir(
+      fs::path {homedir} / ".config/sunshine"sv,
+      fs::path {homedir} / ".config/stand-in-server"sv
+    );
+    return config_path;
   }
 
   using ifaddr_t = util::safe_ptr<ifaddrs, freeifaddrs>;

@@ -38,6 +38,7 @@
 #include "misc.h"
 #include "src/config.h"
 #include "src/entry_handler.h"
+#include "src/file_handler.h"
 #include "src/logging.h"
 #include "src/platform/common.h"
 #include "vaapi.h"
@@ -132,22 +133,26 @@ namespace platf {
         homedir = getpwuid(geteuid())->pw_dir;
       }
 
+      fs::path config_base;
       // May be set if running under a systemd service with the ConfigurationDirectory= option set.
       if ((dir = getenv("CONFIGURATION_DIRECTORY")) != nullptr && strlen(dir) > 0) {
         found = true;
-        config_path = fs::path(dir) / "sunshine"sv;
+        config_base = fs::path(dir);
       }
       // Otherwise, follow the XDG base directory specification:
       // https://specifications.freedesktop.org/basedir-spec/basedir-spec-latest.html
       if (!found && (dir = getenv("XDG_CONFIG_HOME")) != nullptr && strlen(dir) > 0) {
         found = true;
-        config_path = fs::path(dir) / "sunshine"sv;
+        config_base = fs::path(dir);
       }
       // As a last resort, use the home directory
       if (!found) {
         migrate_config = false;
-        config_path = fs::path(homedir) / ".config/sunshine"sv;
+        config_base = fs::path(homedir) / ".config"sv;
       }
+
+      // Builds before the rename used a directory called "sunshine"; move it over once.
+      config_path = file_handler::migrate_config_dir(config_base / "sunshine"sv, config_base / "stand-in-server"sv);
 
       // migrate from the old config location if necessary
       migrate_envvar = getenv("SUNSHINE_MIGRATE_CONFIG");
